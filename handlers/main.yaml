@@ -1,0 +1,5 @@
+---
+- name: ATR | Restart asterisk
+  service:
+    name: "asterisk.service"
+    state: restarted

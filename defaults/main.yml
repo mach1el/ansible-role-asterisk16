@@ -1,0 +1,18 @@
+---
+
+atr_src_path: "/usr/src"
+atr_dir: "/usr/src/asterisk-16.16.1"
+atr_repo: "http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-16-current.tar.gz"
+atr_dependencies: 
+  - git
+  - curl
+  - wget
+  - libnewt-dev
+  - libssl-dev
+  - libncurses5-dev
+  - subversion
+  - libsqlite3-dev
+  - build-essential
+  - libjansson-dev
+  - libxml2-dev
+  - uuid-dev

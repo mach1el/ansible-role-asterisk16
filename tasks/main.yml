@@ -1,0 +1,59 @@
+---
+- name: ATR | Install dependencies.
+  apt: name={{ atr_dependencies }} state=present
+
+- name: ATR | Get source.
+  get_url:
+    url: "{{ atr_repo }}"
+    dest:  "{{ atr_src_path }}"
+
+- name: ATR | Extract file.
+  unarchive:
+    src: "{{ atr_src_path }}/asterisk-16-current.tar.gz"
+    dest: "{{ atr_src_path }}"
+    remote_src: True
+
+- name: ATR | Contrib install.
+  shell: 'export DEBIAN_FRONTEND=noninteractive && yes |
+  ./contrib/scripts/install_prereq install chdir={{ atr_dir }}'
+
+- name: ATR | Configure.
+  command: ./configure --with-pjproject-bundled chdir={{ atr_dir }}
+
+- name: ATR | Create menuselect
+  command: make menuselect.makeopts chdir={{ atr_dir }}
+
+- name: Do a bit of menuselect configuration
+  command: "{{ item }} chdir={{ atr_dir }}"
+  with_items:
+    - 'menuselect/menuselect --enable format_mp3'
+    - 'menuselect/menuselect --enable codec_opus'
+    - 'menuselect/menuselect --enable CORE-SOUNDS-EN-WAV
+    --enable CORE-SOUNDS-EN-G722'
+    - 'menuselect/menuselect  --enable EXTRA-SOUNDS-EN-GSM
+    --enable EXTRA-SOUNDS-EN-WAV --enable EXTRA-SOUNDS-EN-G722'
+    - 'menuselect/menuselect --enable app_statsd
+    --enable chan_pjsip menuselect.makeopts'
+
+- name: ATR | Make.
+  command: make  chdir={{ atr_dir }}
+
+- name: ATR | Make install.
+  command: make install chdir={{ atr_dir }}
+
+- name: ATR | Make progdocs.
+  command: make samples chdir={{ atr_dir }} 
+
+- name: ATR | Make samples.
+  command: make samples chdir={{ atr_dir }}
+
+- name: ATR | Make config.
+  command: make config chdir={{ atr_dir }}
+
+- name: ATR | Make ldconfig.
+  command: ldconfig chdir={{ atr_dir }}
+
+- name: ATR | Enable Service.
+  service:
+    name: asterisk
+    enabled: yes
